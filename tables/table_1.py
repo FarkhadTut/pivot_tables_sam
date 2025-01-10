@@ -52,11 +52,42 @@ def concat():
 
 
         df_estz_total = df_estz if df_estz_total.empty else pd.concat([df_estz_total, df_estz.tail(-1)], axis=0)## adding tail(-1) to remove subheaders from non-first dfs
+        df_estz_total.reset_index(inplace=True, drop=True)
+
+    for col in df_eiz_total.columns:
+        try:
+            mask = df_eiz_total['Unnamed: 1'] == 'Жами'
+            total_value = df_eiz_total[mask][col].sum()
+            if isinstance(total_value, int) or isinstance(total_value, float): 
+                df_eiz_total.at[0, col] = total_value
+        except:
+            pass
+    
+    for col in df_ksz_total.columns:
+        try:
+            mask = df_ksz_total['Unnamed: 1'] == 'Жами'
+            total_value = df_ksz_total[mask][col].sum()
+            if isinstance(total_value, int) or isinstance(total_value, float): 
+                df_ksz_total.at[0, col] = total_value
+        except:
+            pass
+
+    for col in df_estz_total.columns:
+        try:
+            mask = df_estz_total['Unnamed: 1'] == 'Жами'
+            total_value = df_estz_total[mask][col].sum()
+            if isinstance(total_value, int) or isinstance(total_value, float): 
+                df_estz_total.at[0, col] = total_value
+        except:
+            pass
 
     df_total = pd.concat([df_eiz_total, df_ksz_total, df_estz_total], axis=0)
-    print(df_total)
-    exit()
+
+
+
     df_total = add_headers(df_total, FILES_STARTWITH)
+    df_total.columns
+  
     df_total.to_excel(FILENAME_OUT, 
                       sheet_name=sheet_name,
                       index=False)

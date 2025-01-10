@@ -3,24 +3,28 @@ import os
 from glob import glob
 from openpyxl.styles.alignment import Alignment
 from openpyxl.styles import Font
+from openpyxl.styles.borders import Border, Side
 from openpyxl.utils import column_index_from_string, get_column_letter
-
+# from .utils import merge_headers
 merge_walk_horiz = 20
-merge_walk_vert = 5
+merge_walk_vert = 4
 
-def table_1():
+FILES_STARTWITH = '3.'
+
+def table_3():
     files = glob(os.path.join(os.path.join('out', '*.xlsx')))
-    file = files[0]
+    file = [f for f in files if os.path.basename(f).startswith(FILES_STARTWITH)][0]
+    filename_out = os.path.join('out', 'pretty', os.path.basename(file).replace('.xlsx', '_formatted.xlsx'))
     wb = openpyxl.load_workbook(file)
-    ws = wb['СЗ-1']
+    ws = wb.active
     ws.delete_rows(1)
     ws.delete_rows(1)
-    
+    ws.delete_rows(1)
     ## pure exception just for this table 
-    ws.cell(1, column_index_from_string('AB')).value = '.'
+    ws.cell(1, column_index_from_string('B')).value = 'Туман (шаҳар) номи'
+    ws.cell(2, column_index_from_string('B')).value = None
+    ws.cell(3, column_index_from_string('B')).value = None
     ####
-    
-    
     for col in range(1, ws.max_column+1):
         for row in range(1, merge_walk_vert):
             cell = ws.cell(row, col)
@@ -30,8 +34,13 @@ def table_1():
                                        horizontal='center',
                                        vertical='center')
             cell.font = Font(bold=True)
+            thin_border = Border(left=Side(style='thin'), 
+                     right=Side(style='thin'), 
+                     top=Side(style='thin'), 
+                     bottom=Side(style='thin'))
+            cell.border = thin_border
 
-######################## MERGE HEADERS #############################################
+            ######################## MERGE HEADERS #############################################
             horiz_merge = 0
             vert_merge = 0
             for walk_step in range(1, merge_walk_horiz-1): 
@@ -43,7 +52,7 @@ def table_1():
                     if row != 1:
                         try:
                             for upper_row in range(1, row):
-                               
+                                
                                 if not ws.cell(row-upper_row, col_next).value is None:
                                     raise Exception('break')
                             else:
@@ -68,20 +77,40 @@ def table_1():
                 else:
                     break
             
+            # if ws.cell(row, col).value == '2024 йил' and row==4:
+            #     print(ws.cell(row, col).value)
+            #     print("Vert:", vert_merge)
+            #     print("Horiz:", horiz_merge)
+            #     start_column = get_column_letter(col)
+            #     end_column = get_column_letter(col+horiz_merge)
+            #     range_str = f'{start_column}{row}:{end_column}{row+vert_merge}'
+            #     print(range_str)
+            #     print()
 
-            ws.merge_cells(start_row=row,\
-                           end_row=row+vert_merge,\
-                           start_column=col,
-                           end_column=col+horiz_merge)
-                
+
+            start_column = get_column_letter(col)
+            end_column = get_column_letter(col+horiz_merge)
+            range_str = f'{start_column}{row}:{end_column}{row+vert_merge}'
+            ws.merge_cells(range_str)
+         
 ###################################################################################
 
-            
         ws.column_dimensions[get_column_letter(col)].width = 18.7
     
     for row in range(1, merge_walk_vert):   
         ws.row_dimensions[row].height = 37.25
 
-
-    wb.save(os.path.join('out', 'pretty', os.path.basename(file).replace('.xlsx', '_formatted.xlsx')))
+    
+    wb.save(filename_out)
     wb.close()
+
+
+
+
+
+
+
+
+
+
+

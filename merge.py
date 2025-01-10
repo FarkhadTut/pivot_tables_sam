@@ -15,8 +15,7 @@ from tables.table_12_1 import concat as table_12_1
 from tables.table_12 import concat as table_12
 
 
-import warnings
-warnings.filterwarnings('ignore')
+
 
 def main(*args, **kwargs):
     table_1()
