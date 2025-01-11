@@ -4,6 +4,7 @@ import os
 from tables.path import get_all_files
 from tables.utils import getIndexes
 from templates.templates import get_template
+from .utils import add_sum_formula
 
 FILES_STARTWITH = '1.'
 FILENAME_OUT = os.path.join('out', f'{FILES_STARTWITH}.xlsx')
@@ -19,6 +20,9 @@ def concat():
         df_total = df_out if df_total.empty else pd.concat([df_out, df_total], axis=0)
 
     df_total = add_headers(df_total, FILES_STARTWITH, sheet_name)
+    df_total.reset_index(inplace=True, drop=True)
+    df_total = add_sum_formula(df_total, 'ЖАМИ')
+
     with pd.ExcelWriter(path=FILENAME_OUT, mode='a', engine='openpyxl') as writer:
         df_total.to_excel(writer, 
                         sheet_name=sheet_name,

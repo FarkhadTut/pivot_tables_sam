@@ -5,6 +5,7 @@ from tables.path import get_all_files
 from tables.utils import getIndexes
 from templates.templates import get_template
 import movecolumn as mc
+from .utils import add_sum_formula
 
 FILES_STARTWITH = '10.'
 FILENAME_OUT = os.path.join('out', f'{FILES_STARTWITH}.xlsx')
@@ -18,10 +19,13 @@ def concat():
     for file in files:
         df_out = crop_data(file, sheet_name)
         df_out = add_district_col(df_out, file)
+        df_out = add_total_row(df_out)
         df_total = df_out if df_total.empty else pd.concat([df_out, df_total], axis=0)
 
 
     df_total = add_headers(df_total, FILES_STARTWITH, sheet_name)
+    df_total.reset_index(inplace=True, drop=True)
+    df_total = add_sum_formula(df_total, "ЖАМИ", col_total_idx=2, sum_start_col_idx=3)
     with pd.ExcelWriter(path=FILENAME_OUT, mode='w', engine='openpyxl') as writer:
         df_total.to_excel(writer, 
                           sheet_name=sheet_name,
@@ -84,4 +88,17 @@ def add_district_col(df, filepath):
     df[col_name] = district 
     df = mc.MoveTo2(df, col_name)
     return df
+
+def add_total_row(df_out):
+    df_out.reset_index(inplace=True, drop=True)
+    columns = df_out.columns.values
     
+    if df_out.at[0, columns[2]] == 'Ҳудуд бўйича - жами':
+        df_out = df_out.tail(-1)
+
+    df_out = pd.concat([df_out.head(1), df_out], axis=0)
+    df_out.reset_index(inplace=True, drop=True)
+    df_out.iloc[0] = pd.NA
+    df_out.at[0, columns[2]] = "Жами"
+    df_out.at[0, columns[1]] = df_out.at[1, columns[1]]
+    return df_out

@@ -4,6 +4,8 @@ import os
 from tables.path import get_all_files
 from tables.utils import getIndexes
 from templates.templates import get_template
+from openpyxl.utils import get_column_letter
+from .utils import add_sum_formula_table_1, add_ksz_sum_formula_table_1
 
 FILES_STARTWITH = '1.'
 FILENAME_OUT = os.path.join('out', f'{FILES_STARTWITH}.xlsx')
@@ -15,79 +17,27 @@ def concat():
     df_eiz_total = pd.DataFrame()
     for i, file in enumerate(files):
         df_eiz = eiz(file)
-        for col in df_eiz.columns:
-            try:
-                total_value = df_eiz[col].sum()
-                if isinstance(total_value, int) or isinstance(total_value, float): 
-                    df_eiz.at[1, col] = total_value
-            except:
-                pass
-      
         df_eiz_total = df_eiz if df_eiz_total.empty else pd.concat([df_eiz_total, df_eiz.tail(-1)], axis=0) ## adding tail(-1) to remove subheaders from non-first dfs
 
     df_ksz_total = pd.DataFrame()
     for i, file in enumerate(files):
         df_ksz = ksz(file)
-        for col in df_ksz.columns:
-            try:
-                total_value = df_ksz[col].sum()
-                if isinstance(total_value, int) or isinstance(total_value, float): 
-                    df_ksz.at[1, col] = total_value
-            except:
-                pass
-
-
         df_ksz_total = df_ksz if df_ksz_total.empty else pd.concat([df_ksz_total, df_ksz.tail(-1)], axis=0)## adding tail(-1) to remove subheaders from non-first dfs
 
     df_estz_total = pd.DataFrame()
     for i, file in enumerate(files):
         df_estz = estz(file)
-        for col in df_estz.columns:
-            try:
-                total_value = df_estz[col].sum()
-                if isinstance(total_value, int) or isinstance(total_value, float): 
-                    df_estz.at[1, col] = total_value
-            except:
-                pass
-
-
         df_estz_total = df_estz if df_estz_total.empty else pd.concat([df_estz_total, df_estz.tail(-1)], axis=0)## adding tail(-1) to remove subheaders from non-first dfs
-        df_estz_total.reset_index(inplace=True, drop=True)
 
-    for col in df_eiz_total.columns:
-        try:
-            mask = df_eiz_total['Unnamed: 1'] == 'Жами'
-            total_value = df_eiz_total[mask][col].sum()
-            if isinstance(total_value, int) or isinstance(total_value, float): 
-                df_eiz_total.at[0, col] = total_value
-        except:
-            pass
-    
-    for col in df_ksz_total.columns:
-        try:
-            mask = df_ksz_total['Unnamed: 1'] == 'Жами'
-            total_value = df_ksz_total[mask][col].sum()
-            if isinstance(total_value, int) or isinstance(total_value, float): 
-                df_ksz_total.at[0, col] = total_value
-        except:
-            pass
-
-    for col in df_estz_total.columns:
-        try:
-            mask = df_estz_total['Unnamed: 1'] == 'Жами'
-            total_value = df_estz_total[mask][col].sum()
-            if isinstance(total_value, int) or isinstance(total_value, float): 
-                df_estz_total.at[0, col] = total_value
-        except:
-            pass
 
     df_total = pd.concat([df_eiz_total, df_ksz_total, df_estz_total], axis=0)
 
 
 
     df_total = add_headers(df_total, FILES_STARTWITH)
-    df_total.columns
-  
+    df_total.reset_index(inplace=True, drop=True)
+    df_total = add_sum_formula_table_1(df_total, 'ЖАМИ')
+    df_total = add_ksz_sum_formula_table_1(df_total, 'ЖАМИ')
     df_total.to_excel(FILENAME_OUT, 
                       sheet_name=sheet_name,
                       index=False)

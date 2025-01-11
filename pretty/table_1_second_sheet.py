@@ -5,6 +5,8 @@ from openpyxl.styles.alignment import Alignment
 from openpyxl.styles import Font
 from openpyxl.styles.borders import Border, Side
 from openpyxl.utils import column_index_from_string, get_column_letter
+import xlwings as xw
+
 # from .utils import merge_headers
 merge_walk_horiz = 20
 merge_walk_vert = 5
@@ -13,10 +15,18 @@ def table_1_second_sheet():
     files = glob(os.path.join(os.path.join('out', '*.xlsx')))
     file = files[0]
     filename_out = os.path.join('out', 'pretty', os.path.basename(file).replace('.xlsx', '_formatted.xlsx'))
+
+    wb_xl = xw.Book(filename_out)
+    wb_xl.sheets['СЗ-2'].range('1:2').delete()
+    wb_xl.save()
+    wb_xl.close()
+
     wb = openpyxl.load_workbook(filename_out)
     ws = wb['СЗ-2']
-    ws.delete_rows(1)
-    ws.delete_rows(1)
+    # ws.delete_rows(1)
+    # ws.delete_rows(1)
+
+    
     ## pure exception just for this table 
     ws.cell(1, column_index_from_string('U')).value = '.'
     ####
@@ -91,6 +101,7 @@ def table_1_second_sheet():
 ###################################################################################
 
         ws.column_dimensions[get_column_letter(col)].width = 18.7
+        ws.column_dimensions[get_column_letter(1)].width = 4.86
     
     for row in range(1, merge_walk_vert):   
         ws.row_dimensions[row].height = 37.25

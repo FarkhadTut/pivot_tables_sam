@@ -9,17 +9,17 @@ from openpyxl.utils import column_index_from_string, get_column_letter
 import xlwings as xw
 
 merge_walk_horiz = 20
-merge_walk_vert = 3
+merge_walk_vert = 4
 
-FILES_STARTWITH = '4. '
+FILES_STARTWITH = '4.1.'
 
-def table_4():
+def table_4_1():
     files = glob(os.path.join(os.path.join('out', '*.xlsx')))
     file = [f for f in files if os.path.basename(f).startswith(FILES_STARTWITH)][0]
     filename_out = os.path.join('out', 'pretty', os.path.basename(file).replace('.xlsx', '_formatted.xlsx'))
 
     wb_xl = xw.Book(file)
-    wb_xl.sheets[0].range('1:1').delete()
+    wb_xl.sheets[0].range('1:3').delete()
     wb_xl.save()
     wb_xl.close()
 
@@ -27,8 +27,8 @@ def table_4():
     ws = wb.active
     # ws.delete_rows(1)
     ## pure exception just for this table 
-    ws.cell(1, column_index_from_string('B')).value = 'Туман (шаҳар) номи'
-    ws.cell(2, column_index_from_string('B')).value = None
+    # ws.cell(1, column_index_from_string('B')).value = 'Туман (шаҳар) номи'
+    # ws.cell(2, column_index_from_string('B')).value = None
     ####
     for col in range(1, ws.max_column+1):
         for row in range(1, merge_walk_vert):

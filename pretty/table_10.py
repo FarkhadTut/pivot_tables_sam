@@ -5,6 +5,7 @@ from openpyxl.styles.alignment import Alignment
 from openpyxl.styles import Font
 from openpyxl.styles.borders import Border, Side
 from openpyxl.utils import column_index_from_string, get_column_letter
+import xlwings as xw
 # from .utils import merge_headers
 merge_walk_horiz = 20
 merge_walk_vert = 3
@@ -15,12 +16,17 @@ def table_10():
     files = glob(os.path.join(os.path.join('out', '*.xlsx')))
     file = [f for f in files if os.path.basename(f).startswith(FILES_STARTWITH)][0]
     filename_out = os.path.join('out', 'pretty', os.path.basename(file).replace('.xlsx', '_formatted.xlsx'))
+
+    wb_xl = xw.Book(file)
+    wb_xl.sheets[0].range('1:2').delete()
+    wb_xl.save()
+    wb_xl.close()
+
     wb = openpyxl.load_workbook(file)
     ws = wb.active
-    ws.delete_rows(1)
-    ws.delete_rows(1)
+    # ws.delete_rows(1)
+    # ws.delete_rows(1)
     ## pure exception just for this table 
-    ws.cell(1, column_index_from_string('B')).value = 'Туман (шаҳар) номи'
     ####
     for col in range(1, ws.max_column+1):
         for row in range(1, merge_walk_vert):
@@ -93,9 +99,10 @@ def table_10():
 ###################################################################################
 
         ws.column_dimensions[get_column_letter(col)].width = 18.7
+        ws.column_dimensions[get_column_letter(1)].width = 4.86
     
-    for row in range(1, merge_walk_vert):   
-        ws.row_dimensions[row].height = 37.25
+    ws.row_dimensions[1].height = 21.5
+    ws.row_dimensions[2].height = 85.5
 
     
     wb.save(filename_out)

@@ -2,6 +2,7 @@ from pretty.table_1 import table_1
 from pretty.table_1_second_sheet import table_1_second_sheet
 from pretty.table_3 import table_3
 from pretty.table_4 import table_4
+from pretty.table_4_1 import table_4_1
 from pretty.table_5_1 import table_5_1
 from pretty.table_5 import table_5
 from pretty.table_6 import table_6
@@ -18,11 +19,13 @@ def main():
     table_1_second_sheet()
     table_3()
     table_4()
+    table_4_1()
     table_5()
     table_5_1()
     table_6()
     table_7()
     table_8()
+    table_9()
     table_10()
     table_11()
     table_12()

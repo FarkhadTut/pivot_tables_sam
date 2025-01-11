@@ -91,7 +91,7 @@ def table_1():
 ###################################################################################
 
         ws.column_dimensions[get_column_letter(col)].width = 18.7
-    
+        ws.column_dimensions[get_column_letter(1)].width = 4.86
     for row in range(1, merge_walk_vert):   
         ws.row_dimensions[row].height = 37.25
 
